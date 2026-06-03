@@ -17,6 +17,7 @@ models/
 test_videos/*.mp4
 test_videos/*.avi
 test_videos/*.mov
+data_videos/
 
 # IDE
 .vscode/

@@ -57,32 +57,103 @@ class PoseExtractor:
         self.model = YOLO(model_name)
 
     @staticmethod
-    def _parse_keypoints(results) -> list[dict]:
-        """Convert raw YOLO output into a list of {id, x, y, confidence} dicts."""
+    def _parse_keypoints(results, person_idx: int = 0) -> list[dict]:
+        """
+        Convert raw YOLO output into a list of {id, x, y, confidence} dicts
+        for a specific person.
+
+        Parameters
+        ----------
+        results : ultralytics Results
+            YOLO prediction results.
+        person_idx : int
+            Index of the person to extract (default: 0).
+
+        Returns
+        -------
+        list[dict]
+            Empty list if no detections or person_idx out of range.
+        """
         kps_data: list[dict] = []
         if results[0].keypoints is None or len(results[0].keypoints.xy) == 0:
             return kps_data
 
+        n_people = len(results[0].keypoints.xy)
+        if person_idx >= n_people:
+            return kps_data
+
         kps = results[0].keypoints
-        for i in range(len(kps.xy[0])):
-            x, y = kps.xy[0][i].tolist()
-            conf = float(kps.conf[0][i].item())
+        for i in range(len(kps.xy[person_idx])):
+            x, y = kps.xy[person_idx][i].tolist()
+            conf = float(kps.conf[person_idx][i].item())
             kps_data.append({"id": i, "x": x, "y": y, "confidence": conf})
         return kps_data
 
-    def extract_from_frame(self, frame: np.ndarray) -> tuple[list[dict], np.ndarray]:
+    def get_detections(self, frame: np.ndarray) -> list[dict]:
+        """
+        Get ALL people detected in a frame.
+
+        Returns
+        -------
+        list[dict]
+            Each dict::
+                {
+                    "keypoints": list of {id, x, y, confidence},
+                    "bbox": [x1, y1, x2, y2],
+                    "confidence": float  # overall detection confidence
+                }
+            Empty list if no one detected.
+        """
+        results = self.model(frame, verbose=False)
+        if results[0].keypoints is None or len(results[0].keypoints.xy) == 0:
+            return []
+
+        kps = results[0].keypoints
+        boxes = results[0].boxes
+
+        detections: list[dict] = []
+        n_people = len(kps.xy)
+        for p_idx in range(n_people):
+            kp_list = []
+            for i in range(len(kps.xy[p_idx])):
+                x, y = kps.xy[p_idx][i].tolist()
+                conf = float(kps.conf[p_idx][i].item())
+                kp_list.append({"id": i, "x": x, "y": y, "confidence": conf})
+
+            bbox = boxes.xyxy[p_idx].tolist() if boxes is not None else None
+            det_conf = float(boxes.conf[p_idx].item()) if boxes is not None else 0.0
+
+            detections.append({
+                "keypoints": kp_list,
+                "bbox": bbox,
+                "confidence": det_conf,
+            })
+
+        return detections
+
+    def extract_from_frame(
+        self, frame: np.ndarray, person_idx: int = 0
+    ) -> tuple[list[dict], np.ndarray]:
         """
         Run pose estimation on a single frame.
+
+        Parameters
+        ----------
+        frame : np.ndarray
+            Input frame (BGR).
+        person_idx : int
+            Which person to extract (default: 0, the first detected).
 
         Returns
         -------
         keypoints : list[dict]
-            List of {id, x, y, confidence} for every detected keypoint.
+            List of {id, x, y, confidence} for every detected keypoint
+            of the selected person.
         annotated : np.ndarray
-            Frame with skeleton + keypoints drawn.
+            Frame with skeleton + keypoints drawn for ALL detected people.
         """
         results = self.model(frame, verbose=False)
-        kps = self._parse_keypoints(results)
+        kps = self._parse_keypoints(results, person_idx=person_idx)
         annotated = results[0].plot()
         return kps, annotated
 

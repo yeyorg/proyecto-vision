@@ -120,6 +120,7 @@ score 0-100 + feedback personalizado
 | `src/squat_classifier.py` | Clasificador basado en reglas. Interfaz `predict()` / `predict_proba()`. |
 | `app.py` | Aplicacion Streamlit con upload de video y visualizacion. |
 | `squat_form.ipynb` | Notebook interactivo para exploracion y pruebas. |
+| `tests/test_classifier.py` | Tests unitarios del clasificador con datos sinteticos. |
 
 ---
 
@@ -239,10 +240,6 @@ cd proyecto-vision
 uv venv
 uv sync
 
-# 3. Entrenar el modelo
-uv run python train_model.py
-```
-
 Listo. No hace falta activar el venv -- `uv run` lo usa automagicamente.
 Si preferis activarlo: `.venv\Scripts\activate` (Windows) o
 `source .venv/bin/activate` (Linux/macOS).
@@ -268,14 +265,14 @@ uv run jupyter notebook squat_form.ipynb
 Exploracion interactiva: proba la extraccion de pose, calcula angulos, evalua
 sentadillas sinteticas.
 
-### Entrenar modelo
+### Tests
 
 ```bash
-uv run python train_model.py
+uv run --group dev pytest tests/ -v
 ```
 
-Genera `models/squat_form_model.pkl`. El clasificador usa reglas biomecanicas,
-no necesita datos de entrenamiento.
+Verifica que el clasificador basado en reglas funciona correctamente
+usando datos sintéticos de sentadillas buenas y malas.
 
 ---
 
@@ -285,7 +282,7 @@ no necesita datos de entrenamiento.
 make help       # Muestra todos los comandos disponibles
 make run        # Inicia la app Streamlit
 make notebook   # Abre el notebook
-make train      # Entrena y guarda el modelo
+make test       # Corre tests unitarios del clasificador
 make check      # Verifica que todo funciona
 make clean      # Limpia archivos generados
 make deep-clean # Limpia todo incluyendo .venv
@@ -299,8 +296,8 @@ make deep-clean # Limpia todo incluyendo .venv
 # Iniciar la app
 uv run streamlit run app.py
 
-# Entrenar modelo
-uv run python train_model.py
+# Correr tests
+uv run --group dev pytest tests/ -v
 
 # Verificar instalacion
 uv run python -c "from src.pose_extractor import PoseExtractor; print('OK')"
@@ -420,7 +417,7 @@ DEFAULT_THRESHOLDS = {
 }
 ```
 
-Corre `uv run python train_model.py` para actualizar el modelo.
+Corre `uv run --group dev pytest tests/ -v` para verificar que el clasificador funciona correctamente.
 
 ---
 

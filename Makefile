@@ -4,7 +4,7 @@
 # Requiere: uv (https://docs.astral.sh/uv/)
 # ─────────────────────────────────────────────────────────────
 
-.PHONY: help setup install sync run train notebook check lint clean deep-clean
+.PHONY: help setup install sync run notebook test check lint clean deep-clean
 
 help: ## Mostrar ayuda con todos los comandos
 	@type Makefile 2>nul | findstr /r "^[a-z].*:.*##" | powershell -Command \
@@ -38,21 +38,25 @@ install: sync ## Alias para sync
 run: ## Correr la app Streamlit
 	uv run streamlit run app.py
 
-notebook: ## Iniciar Jupyter Notebook
+notebook: ## Iniciar Jupyter Notebook (exploración)
 	uv run jupyter notebook squat_form.ipynb
 
-train: ## Entrenar y guardar el modelo
-	uv run python train_model.py
+train-xgb: ## Entrenar XGBoost desde el notebook
+	uv run jupyter nbconvert --to notebook --execute --inplace xgboost_training.ipynb
+
+# ── Tests ───────────────────────────────────────────────────
+
+test: ## Correr tests unitarios del clasificador
+	uv run --group dev pytest tests/ -v
 
 # ── Mantenimiento ───────────────────────────────────────────
 
 clean: ## Limpiar archivos generados
-	rm -rf __pycache__ src/__pycache__
+	rm -rf __pycache__ src/__pycache__ tests/__pycache__
 	rm -rf .pytest_cache
 	rm -rf .ipynb_checkpoints
 	rm -f test_videos/*_annotated.mp4
 	@echo "Cache y archivos temporales eliminados"
-	@echo "ATENCION: corre 'make train' para regenerar el modelo"
 
 deep-clean: clean ## Limpiar todo, incluyendo .venv y uv.lock
 	rm -rf .venv
@@ -68,6 +72,7 @@ lint: ## Verificar sintaxis de Python
 	uv run python -m py_compile src/angle_utils.py
 	uv run python -m py_compile src/pose_extractor.py
 	uv run python -m py_compile app.py
+	uv run python -m py_compile tests/test_classifier.py
 	@echo "Todo compila sin errores"
 
 check: ## Verificar que todo funciona
