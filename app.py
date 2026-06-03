@@ -246,10 +246,6 @@ def main():
             video_bytes = uploaded.getvalue()
             st.sidebar.success(f"✅ {uploaded.name} subido ({uploaded.size / 1024 / 1024:.1f} MB)")
 
-    # Opciones de análisis
-    st.sidebar.header("⚙️ Opciones")
-    show_angles_on_video = st.sidebar.checkbox("Mostrar ángulos en video", value=True)
-
     # ── Sin video ─────────────────────────────────────────────────────────
     if video_bytes is None:
         st.info("👈 Subí un video MP4 desde la barra lateral para analizar tu sentadilla.")
