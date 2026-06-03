@@ -38,8 +38,11 @@ install: sync ## Alias para sync
 run: ## Correr la app Streamlit
 	uv run streamlit run app.py
 
-notebook: ## Iniciar Jupyter Notebook
+notebook: ## Iniciar Jupyter Notebook (exploración)
 	uv run jupyter notebook squat_form.ipynb
+
+train-xgb: ## Entrenar XGBoost desde el notebook
+	uv run jupyter nbconvert --to notebook --execute --inplace xgboost_training.ipynb
 
 # ── Tests ───────────────────────────────────────────────────
 
