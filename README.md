@@ -2,14 +2,16 @@
 
 [![GitHub](https://img.shields.io/badge/github-yeyorg/proyecto--vision-blue?logo=github)](https://github.com/yeyorg/proyecto-vision)
 
-> Detectá y analizá la técnica de sentadillas usando visión por computadora
-> con YOLOv8-pose + reglas biomecánicas.
+> Analizá la técnica de tus sentadillas subiendo un video —
+> YOLOv8-pose detecta keypoints, calcula ángulos biomecánicos
+> y los evalúa contra rangos óptimos con reglas interpretables.
 
 ---
 
 ## Tabla de contenidos
 
 - [Descripcion](#descripcion)
+- [Cambios recientes](#cambios-recientes)
 - [Arquitectura](#arquitectura)
 - [Requisitos](#requisitos)
 - [Instalacion](#instalacion)
@@ -44,6 +46,35 @@ funcionan desde el primer momento. Cada metrica tiene feedback especifico
 | Knee tracking | 1x | Desplazamiento horizontal rodilla sobre tobillo |
 | Symmetry (simetria) | 1x | Diferencia entre lado izquierdo y derecho |
 | Stability (rango) | 0.5x | Rango de movimiento completo |
+
+---
+
+## Cambios recientes
+
+### Eliminado: modo tiempo real y detección por webcam
+
+Se removió toda la funcionalidad de análisis en vivo para simplificar el proyecto
+a un solo flujo: **subir video → analizar**.
+
+| Lo que se fue | Por qué |
+|---|---|
+| `realtime.py` (443 lines) | Ventana OpenCV con webcam, detección de fases y scoring en vivo |
+| `SquatDetector` + `SquatPhase` | Máquina de estados que clasificaba fases (de pie/bajando/fondo/subiendo) — solo la usaba `realtime.py` |
+| Webcam en `app.py` | Opción "Webcam (foto)" y botones de "Tiempo Real" en la sidebar |
+| `make realtime` | Target del Makefile |
+
+El proyecto ahora se enfoca exclusivamente en el análisis de **videos grabados**
+(subidos por el usuario), sin depender de la cámara ni de procesamiento en tiempo real.
+
+### Flujo actual
+
+```
+Subís un video MP4 → YOLOv8-pose detecta keypoints →
+se calculan ángulos biomecánicos por frame →
+se agregan estadísticos (mean, std, min, max) →
+SquatFormClassifier evalúa con reglas →
+score 0-100 + feedback personalizado
+```
 
 ---
 
@@ -303,4 +334,4 @@ Para uso personal y educativo.
 
 ---
 
-*Ultima actualizacion: 2026-06-01*
+*Ultima actualizacion: 2026-06-02*
