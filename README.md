@@ -121,6 +121,115 @@ score 0-100 + feedback personalizado
 
 ---
 
+## Reglas de evaluación
+
+El `SquatFormClassifier` evalúa **5 criterios** con distintos pesos.
+Cada criterio usa un estadístico distinto (`min`, `mean`, `max`) según
+lo que tenga sentido biomecánico para esa métrica.
+
+El **score global** es un promedio ponderado:
+
+```
+overall = sum(score_i * weight_i) / sum(weight_i)
+```
+
+Un score >= 60 = buena forma, < 60 = necesita trabajo.
+
+### 1. Depth (profundidad) — peso 2x
+
+Usa el **ángulo MÍNIMO** de rodilla alcanzado en todo el video
+(`knee_angle_min`). Se usa el mínimo porque el momento más profundo
+de la sentadilla es el que define si llegaste a paralelo o no.
+
+| Ángulo mínimo | Score | Significado |
+|---|---|---|
+| ~90° (ideal) | 100 | Paralelo perfecto |
+| 70°–110° | 40–100 | Dentro del rango aceptable |
+| < 70° | 0–40 | Hiperflexión / butt wink |
+| > 110° | 0–40 | No llegaste a paralelo |
+
+```
+Score
+ 100 │     ╱╲
+  80 │    ╱  ╲
+  60 │   ╱    ╲
+  40 │  ╱      ╲
+  20 │ ╱        ╲
+   0 ╱╲__________╲╲__
+     60  70  90  110 130
+           └─ ideal ─┘
+         └── rango ────┘
+```
+
+### 2. Back angle (espalda) — peso 1x
+
+Usa el **PROMEDIO** de inclinación del torso (`back_angle_mean`).
+Se usa el promedio porque la inclinación debería ser consistente
+a lo largo del ejercicio; picos aislados no son representativos.
+
+| Inclinación | Score | Significado |
+|---|---|---|
+| ~35° (ideal) | 100 | Rango normal para barra alta |
+| 15°–50° | 40–100 | Aceptable |
+| < 15° | 0–40 | Muy vertical, pérdida de ventaja mecánica |
+| > 50° | 0–40 | Riesgo lumbar, excesiva inclinación |
+
+### 3. Knee tracking (rodilla sobre tobillo) — peso 1x
+
+Usa el **MÁXIMO ABSOLUTO** de desplazamiento horizontal
+(`knee_toe_x_max` y `knee_toe_x_min`). Se usa el valor pico porque
+una sola vez que la rodilla se vaya demasiado adelante ya es un
+riesgo de lesión — el promedio no capturaría esto.
+
+| Máx desplazamiento | Score | Significado |
+|---|---|---|
+| < 40 px | 70–100 | Controlado |
+| 40–60 px | 30–70 | Se fue un poco |
+| > 60 px | 0–30 | Rodilla en riesgo |
+
+### 4. Symmetry (simetría) — peso 1x
+
+Usa el **PROMEDIO** de la diferencia entre piernas
+(`knee_symmetry_mean`, `hip_symmetry_mean`). Una diferencia sostenida
+indica desbalance muscular o compensación.
+
+| Asimetría | Score | Significado |
+|---|---|---|
+| < 5° | ~95 | Movimiento balanceado |
+| 5°–12° | 70–95 | Asimetría leve |
+| > 12° | 0–70 | Desbalance significativo |
+
+### 5. Stability (rango de movimiento) — peso 0.5x
+
+Usa el **RANGO** de movimiento de rodilla
+(`knee_angle_max - knee_angle_min`). Mide si estás haciendo el
+recorrido completo de una sentadilla o solo media repetición.
+
+| Rango | Score | Significado |
+|---|---|---|
+| > 60° | 100 | Sentadilla completa |
+| 40°–60° | 70–100 | Rango aceptable |
+| 20°–40° | 30–70 | Media sentadilla |
+| < 20° | 0–30 | Casi no hay flexión |
+
+### Ejemplo concreto
+
+Para un video donde:
+- Rodilla mínima: 88° → **Depth = 95**
+- Espalda promedio: 32° → **Back = 85**
+- Máx desplazamiento: 25 px → **Knee = 80**
+- Asimetría promedio: 4° → **Sym = 90**
+- Rango de movimiento: 65° → **Stability = 100**
+
+```
+overall = (95×2 + 85×1 + 80×1 + 90×1 + 100×0.5) / (2 + 1 + 1 + 1 + 0.5)
+       = (190 + 85 + 80 + 90 + 50) / 5.5
+       = 495 / 5.5
+       = 90  ✅ Buena forma
+```
+
+---
+
 ## Requisitos
 
 - **Python** >= 3.12
