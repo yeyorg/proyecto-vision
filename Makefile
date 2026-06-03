@@ -38,9 +38,6 @@ install: sync ## Alias para sync
 run: ## Correr la app Streamlit
 	uv run streamlit run app.py
 
-realtime: ## Modo tiempo real con webcam
-	uv run python realtime.py
-
 notebook: ## Iniciar Jupyter Notebook
 	uv run jupyter notebook squat_form.ipynb
 

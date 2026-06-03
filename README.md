@@ -50,32 +50,32 @@ funcionan desde el primer momento. Cada metrica tiene feedback especifico
 ## Arquitectura
 
 ```
-video / webcam
-      |
-      v
-+------------------+
-|  PoseExtractor   |  YOLOv8-pose -> 17 keypoints COCO
-+------------------+
-      |
-      v
-+------------------+
-|  get_squat_angles |  Calcula angulos por frame
-+------------------+   (rodilla, cadera, espalda, simetria)
-      |
-      v
-+------------------+
-| aggregate_video   |  Estadisticos: mean, std, min, max
-| _features         |
-+------------------+
-      |
-      v
-+------------------+
-| SquatForm         |  Reglas biomecanicas -> score + feedback
-| Classifier        |
-+------------------+
-      |
-      v
-   score 0-100 + consejos
+     video (MP4 subido)
+           |
+           v
+ +------------------+
+ |  PoseExtractor   |  YOLOv8-pose -> 17 keypoints COCO
+ +------------------+
+           |
+           v
+ +------------------+
+ |  get_squat_angles |  Calcula angulos por frame
+ +------------------+   (rodilla, cadera, espalda, simetria)
+           |
+           v
+ +------------------+
+ | aggregate_video   |  Estadisticos: mean, std, min, max
+ | _features         |
+ +------------------+
+           |
+           v
+ +------------------+
+ | SquatForm         |  Reglas biomecanicas -> score + feedback
+ | Classifier        |
+ +------------------+
+           |
+           v
+    score 0-100 + consejos
 ```
 
 ### Modulos
@@ -85,7 +85,7 @@ video / webcam
 | `src/pose_extractor.py` | Wrapper de YOLOv8-pose. Procesa frames y videos. |
 | `src/angle_utils.py` | Calculos geometricos: angulos, features agregadas, explicaciones. |
 | `src/squat_classifier.py` | Clasificador basado en reglas. Interfaz `predict()` / `predict_proba()`. |
-| `app.py` | Aplicacion Streamlit con upload, webcam y visualizacion. |
+| `app.py` | Aplicacion Streamlit con upload de video y visualizacion. |
 | `squat_form.ipynb` | Notebook interactivo para exploracion y pruebas. |
 
 ---
@@ -128,7 +128,7 @@ Si preferis activarlo: `.venv\Scripts\activate` (Windows) o
 uv run streamlit run app.py
 ```
 
-Se abre en el navegador. Subi un video MP4 o usa la webcam para una foto.
+Se abre en el navegador. Subi un video MP4 para analizar.
 
 ### Notebook
 
@@ -278,11 +278,6 @@ uv add ultralytics
 - Asegurate de estar de frente o de perfil a la camara
 - El video debe tener buena iluminacion
 - Probá con el notebook para ver si YOLO detecta keypoints
-
-### Error al abrir la webcam
-
-- Verifica que ningun otro programa este usando la camara
-- En Windows, revisa los permisos de la camara
 
 ### El score de mala forma es muy alto/bajo
 

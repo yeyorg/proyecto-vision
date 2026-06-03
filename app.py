@@ -17,16 +17,13 @@ from pathlib import Path
 import cv2
 import numpy as np
 import streamlit as st
-from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 # ── Nuestros módulos ──────────────────────────────────────────────────────
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from src.pose_extractor import PoseExtractor, KEYPOINT_NAMES
+from src.pose_extractor import PoseExtractor
 from src.angle_utils import (
     get_squat_angles,
     aggregate_video_features,
-    ANGLE_EXPLANATIONS,
-    SQUAT_ANGLE_KEYS,
 )
 from src.squat_classifier import SquatFormClassifier
 
@@ -47,6 +44,7 @@ st.set_page_config(
 
 # ── Helpers ───────────────────────────────────────────────────────────────
 
+
 @st.cache_resource
 def load_models():
     """Cargar modelos (cacheados en memoria)."""
@@ -61,6 +59,7 @@ def load_models():
 def joblib_load_safe(path: Path):
     """Cargar joblib manejando posibles errores de serialización."""
     import joblib
+
     return joblib.load(path)
 
 
@@ -215,32 +214,6 @@ def style_metric(value, max_val=100):
         return f'<span style="color:#dc3545;font-weight:bold;font-size:1.2em">{value:.0f}</span>'
 
 
-def draw_gauge(score, label, max_val=100, size=120):
-    """Dibujar un gauge circular simple con matplotlib."""
-    import matplotlib.pyplot as plt
-
-    fig, ax = plt.subplots(figsize=(2, 2), subplot_kw={"projection": "polar"})
-    ax.set_theta_offset(np.pi / 2)
-    ax.set_theta_direction(-1)
-
-    # Fondo
-    ax.barh(0, np.pi, height=0.8, color="#e0e0e0", linewidth=0)
-    # Score
-    angle = score / max_val * np.pi
-    color = "#28a745" if score >= 80 else "#e67e22" if score >= 50 else "#dc3545"
-    ax.barh(0, angle, height=0.8, color=color, linewidth=0)
-
-    ax.set_ylim(0, 1.5)
-    ax.set_yticks([])
-    ax.set_xticks([])
-    ax.spines[:].set_visible(False)
-    ax.text(0, 0.5, f"{score:.0f}", ha="center", va="center", fontsize=24, fontweight="bold")
-    ax.text(0, -0.3, label, ha="center", va="center", fontsize=8)
-
-    fig.tight_layout(pad=0)
-    return fig
-
-
 # ── Interfaz ──────────────────────────────────────────────────────────────
 
 
@@ -259,90 +232,30 @@ def main():
     # ── Sidebar ───────────────────────────────────────────────────────────
     st.sidebar.header("📤 Input")
 
-    input_mode = st.sidebar.radio(
-        "Fuente de entrada",
-        ["Subir video", "Webcam (foto)"],
-        help="Subí un video grabado o usá la webcam para una foto.",
+    uploaded = st.sidebar.file_uploader(
+        "Seleccionar video",
+        type=["mp4", "avi", "mov", "mkv"],
+        help="Formatos soportados: MP4, AVI, MOV, MKV",
     )
 
     video_bytes = None
-    use_webcam = input_mode == "Webcam (foto)"
-
-    if use_webcam:
-        camera_image = st.sidebar.camera_input("Tomar foto")
-        if camera_image:
-            video_bytes = camera_image.getvalue()
-            st.sidebar.info("📸 Foto capturada. Procesando...")
-    else:
-        uploaded = st.sidebar.file_uploader(
-            "Seleccionar video",
-            type=["mp4", "avi", "mov", "mkv"],
-            help="Formatos soportados: MP4, AVI, MOV, MKV",
-        )
-        if uploaded:
-            if uploaded.size > MAX_VIDEO_SIZE_MB * 1024 * 1024:
-                st.sidebar.error(f"❌ El video es muy grande (máx {MAX_VIDEO_SIZE_MB} MB)")
-            else:
-                video_bytes = uploaded.getvalue()
-                st.sidebar.success(f"✅ {uploaded.name} subido ({uploaded.size / 1024 / 1024:.1f} MB)")
+    if uploaded:
+        if uploaded.size > MAX_VIDEO_SIZE_MB * 1024 * 1024:
+            st.sidebar.error(f"❌ El video es muy grande (máx {MAX_VIDEO_SIZE_MB} MB)")
+        else:
+            video_bytes = uploaded.getvalue()
+            st.sidebar.success(f"✅ {uploaded.name} subido ({uploaded.size / 1024 / 1024:.1f} MB)")
 
     # Opciones de análisis
     st.sidebar.header("⚙️ Opciones")
     show_angles_on_video = st.sidebar.checkbox("Mostrar ángulos en video", value=True)
 
-    # ── Modo Tiempo Real ──────────────────────────────────────────────────
-    st.sidebar.header("🎥 Tiempo Real")
-    st.sidebar.markdown(
-        "Analizá tu sentadilla **en vivo** desde la webcam con detección "
-        "automática de fases (DE PIE → BAJANDO → FONDO → SUBIENDO)."
-    )
-
-    if st.sidebar.button("▶️ Abrir Tiempo Real", use_container_width=True):
-        import subprocess
-        import sys as _sys
-
-        st.sidebar.info("Abriendo ventana de tiempo real...")
-        # Lanzar en un proceso separado para no bloquear Streamlit
-        script = Path(__file__).resolve().parent / "realtime.py"
-        subprocess.Popen(
-            [_sys.executable, str(script)],
-            creationflags=subprocess.CREATE_NO_WINDOW if _sys.platform == "win32" else 0,
-        )
-        st.sidebar.success(
-            "Ventana de tiempo real abierta. "
-            "Presioná **q** sobre la ventana para salir."
-        )
-
-    st.sidebar.markdown("---")
-    st.sidebar.markdown(
-        "💡 *También podés correrlo desde la terminal:*  \n"
-        "`uv run python realtime.py`"
-    )
-
-    # ── Procesar ──────────────────────────────────────────────────────────
+    # ── Sin video ─────────────────────────────────────────────────────────
     if video_bytes is None:
-        st.info(
-            "👈 Subí un video, usá la webcam o activá el **Modo Tiempo Real** "
-            "desde la barra lateral."
-        )
+        st.info("👈 Subí un video MP4 desde la barra lateral para analizar tu sentadilla.")
 
-        # Botón rápido para tiempo real también acá
-        col_rt1, col_rt2 = st.columns([1, 4])
-        with col_rt1:
-            if st.button("🎥 Tiempo Real", use_container_width=True):
-                import subprocess
-                import sys as _sys
-
-                script = Path(__file__).resolve().parent / "realtime.py"
-                subprocess.Popen(
-                    [_sys.executable, str(script)],
-                    creationflags=subprocess.CREATE_NO_WINDOW if _sys.platform == "win32" else 0,
-                )
-                st.success("Ventana de tiempo real abierta. Presioná **q** para salir.")
-
-        st.markdown("---")
         st.markdown("### ¿Cómo funciona?")
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3 = st.columns(3)
         with col1:
             st.markdown("**1. Pose Estimation**")
             st.markdown(
@@ -354,15 +267,9 @@ def main():
                 "Calculamos ángulos de rodilla, cadera, espalda y simetría."
             )
         with col3:
-            st.markdown("**3. Detección de Fase**")
+            st.markdown("**3. Evaluación**")
             st.markdown(
-                "Solo analizamos cuando detectamos movimiento "
-                "de sentadilla — ignoramos cuando estás de pie."
-            )
-        with col4:
-            st.markdown("**4. Evaluación**")
-            st.markdown(
-                "Comparamos contra rangos óptimos y generamos feedback."
+                "Comparamos contra rangos óptimos y generamos feedback personalizado."
             )
 
         st.markdown("---")
@@ -375,81 +282,6 @@ def main():
     progress_bar = st.progress(0)
     status_text = st.empty()
 
-    if use_webcam:
-        # Foto individual — procesar un solo frame
-        status_text.text("📸 Analizando foto...")
-
-        nparr = np.frombuffer(video_bytes, np.uint8)
-        frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-
-        kps, annotated = pose_extractor.extract_from_frame(frame)
-
-        if not kps:
-            st.error("❌ No se detectó ninguna persona en la foto.")
-            st.image(cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB))
-            progress_bar.empty()
-            status_text.empty()
-            return
-
-        kps_dict = pose_extractor.keypoints_to_dict(kps)
-        angles = get_squat_angles(kps_dict)
-        features = aggregate_video_features([angles])
-        criteria, overall = classifier.score_squat(features)
-        pred = int(classifier.predict([features])[0])
-        proba = classifier.predict_proba([features])[0].tolist()
-        feedback = classifier.get_feedback(features)
-
-        # Mostrar resultado
-        col_left, col_right = st.columns([3, 2])
-
-        with col_left:
-            st.subheader("📷 Foto analizada")
-            # Anotar ángulos si se pidió
-            display_frame = annotated.copy()
-            if show_angles_on_video and angles:
-                y = 30
-                for key, val in angles.items():
-                    if "angle" in key:
-                        color = (0, 255, 0) if 70 <= val <= 110 else (0, 165, 255)
-                        cv2.putText(
-                            display_frame,
-                            f"{key}: {val:.0f}°",
-                            (10, y),
-                            cv2.FONT_HERSHEY_SIMPLEX,
-                            0.6,
-                            color,
-                        1,
-                        )
-                        y += 25
-            st.image(cv2.cvtColor(display_frame, cv2.COLOR_BGR2RGB), use_container_width=True)
-
-        with col_right:
-            st.subheader("📊 Resultado")
-            pred_label = "✅ Buena forma" if pred == 0 else "⚠️  Necesita trabajo"
-            st.markdown(f"### {pred_label}")
-            st.markdown(f"**Puntaje global:** {overall:.1f}/100")
-            st.markdown(f"**Confianza:** buena {proba[0]:.0%} / mala {proba[1]:.0%}")
-
-            # Métricas
-            mcol1, mcol2 = st.columns(2)
-            for c in criteria:
-                with mcol1 if c.name in ("depth", "back_angle") else mcol2:
-                    st.metric(
-                        label=c.name.replace("_", " ").title(),
-                        value=f"{c.score:.0f}/100",
-                        delta=None,
-                    )
-
-        # Feedback
-        st.subheader("💡 Feedback")
-        for tip in feedback:
-            st.markdown(tip)
-
-        progress_bar.empty()
-        status_text.empty()
-        return
-
-    # ── Video ─────────────────────────────────────────────────────────────
     status_text.text("⏳ Iniciando análisis...")
     result = process_uploaded_video(
         video_bytes, pose_extractor, classifier, progress_bar, status_text
