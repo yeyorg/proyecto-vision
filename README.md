@@ -1,3 +1,5 @@
+# Proyecto final visión computacional
+
 # Squat Form Analyzer
 
 [![GitHub](https://img.shields.io/badge/github-yeyorg/proyecto--vision-blue?logo=github)](https://github.com/yeyorg/proyecto-vision)
