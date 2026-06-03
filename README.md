@@ -148,19 +148,6 @@ de la sentadilla es el que define si llegaste a paralelo o no.
 | < 70° | 0–40 | Hiperflexión / butt wink |
 | > 110° | 0–40 | No llegaste a paralelo |
 
-```
-Score
- 100 │     ╱╲
-  80 │    ╱  ╲
-  60 │   ╱    ╲
-  40 │  ╱      ╲
-  20 │ ╱        ╲
-   0 ╱╲__________╲╲__
-     60  70  90  110 130
-           └─ ideal ─┘
-         └── rango ────┘
-```
-
 ### 2. Back angle (espalda) — peso 1x
 
 Usa el **PROMEDIO** de inclinación del torso (`back_angle_mean`).
