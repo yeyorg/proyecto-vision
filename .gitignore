@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.venv/
+venv/
+
+# Model files (large binaries)
+*.pt
+*.pth
+models/
+
+# Data
+test_videos/*.mp4
+test_videos/*.avi
+test_videos/*.mov
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Notebook checkpoints
+.ipynb_checkpoints/

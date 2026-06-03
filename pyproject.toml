@@ -1,0 +1,17 @@
+[project]
+name = "proyecto-vision"
+version = "0.2.0"
+description = "Squat Form Analyzer — detección de postura en sentadillas con YOLOv8-pose"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "ultralytics>=8.0.0",
+    "opencv-python>=4.8.0",
+    "streamlit>=1.28.0",
+    "scikit-learn>=1.3.0",
+    "xgboost>=2.0.0",
+    "joblib>=1.3.0",
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "matplotlib>=3.7.0",
+]
