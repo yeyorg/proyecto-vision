@@ -221,10 +221,10 @@ class SquatFormClassifier:
             detail = f"Buen rango de movimiento ({mean_range:.0f}°) — sentadilla completa"
         elif mean_range >= 40:
             score = 70 + (mean_range - 40) / 20 * 30
-            detail = f"Rango de movimiento aceptable ({mean_range:.0f}°), podés bajar un poco más"
+            detail = f"Rango de movimiento aceptable ({mean_range:.0f}°), puedes bajar un poco más"
         elif mean_range >= 20:
             score = 30 + (mean_range - 20) / 20 * 40
-            detail = f"Rango de movimiento limitado ({mean_range:.0f}°), intentá bajar más"
+            detail = f"Rango de movimiento limitado ({mean_range:.0f}°), intenta bajar más"
         else:
             score = max(0, 30 - (20 - mean_range) / 20 * 30)
             detail = f"Rango de movimiento muy limitado ({mean_range:.0f}°), casi no hay flexión de rodilla"
@@ -339,7 +339,7 @@ class SquatFormClassifier:
         elif overall >= self.thresholds["good_form_threshold"]:
             feedback.append(f"📈  Forma aceptable ({overall:.0f}/100) — hay margen de mejora")
         else:
-            feedback.append(f"🔧  Forma necesita trabajo ({overall:.0f}/100) — revisá los puntos críticos")
+            feedback.append(f"🔧  Forma necesita trabajo ({overall:.0f}/100) — revisa los puntos críticos")
 
         return feedback
 

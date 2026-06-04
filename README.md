@@ -4,7 +4,7 @@
 
 [![GitHub](https://img.shields.io/badge/github-yeyorg/proyecto--vision-blue?logo=github)](https://github.com/yeyorg/proyecto-vision)
 
-> Analizá la técnica de tus sentadillas subiendo un video —
+> Analiza la técnica de tus sentadillas subiendo un video —
 > YOLOv8-pose detecta keypoints, calcula ángulos biomecánicos
 > y los evalúa contra rangos óptimos con reglas interpretables.
 
@@ -71,7 +71,7 @@ El proyecto ahora se enfoca exclusivamente en el análisis de **videos grabados*
 ### Flujo actual
 
 ```
-Subís un video MP4 → YOLOv8-pose detecta keypoints →
+Subes un video MP4 → YOLOv8-pose detecta keypoints →
 se calculan ángulos biomecánicos por frame →
 se agregan estadísticos (mean, std, min, max) →
 SquatFormClassifier evalúa con reglas →
@@ -401,9 +401,9 @@ uv add ultralytics
 
 ### "No se detectaron personas en el video"
 
-- Asegurate de estar de frente o de perfil a la camara
+- Asegúrate de estar de frente o de perfil a la camara
 - El video debe tener buena iluminacion
-- Probá con el notebook para ver si YOLO detecta keypoints
+- Prueba con el notebook para ver si YOLO detecta keypoints
 
 ### El score de mala forma es muy alto/bajo
 

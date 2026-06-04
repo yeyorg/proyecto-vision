@@ -84,8 +84,8 @@ def _assess_criterion(c, features: dict) -> dict | None:
                 "criterio": "Profundidad excesiva (butt wink)",
                 "lesiones": "Flexión lumbar bajo carga: sobrecarga de los discos "
                             "intervertebrales y riesgo de lumbalgia/lesión de disco.",
-                "recomendacion": "Controlá la bajada y frená antes de que la pelvis "
-                                 "se 'enrolle' en el fondo. Trabajá movilidad de "
+                "recomendacion": "Controla la bajada y frena antes de que la pelvis "
+                                 "se 'enrolle' en el fondo. Trabaja movilidad de "
                                  "tobillo y cadera para mantener la espalda neutra.",
             }
         return {
@@ -93,7 +93,7 @@ def _assess_criterion(c, features: dict) -> dict | None:
             "criterio": "Poca profundidad (no llega a paralelo)",
             "lesiones": "Sentadilla parcial: menor activación de glúteos e isquios "
                         "y posible sobrecarga de cuádriceps y rodilla por compensación.",
-            "recomendacion": "Bajá de forma controlada hasta que el muslo quede "
+            "recomendacion": "Baja de forma controlada hasta que el muslo quede "
                              "paralelo al piso, si tu movilidad lo permite.",
         }
 
@@ -104,7 +104,7 @@ def _assess_criterion(c, features: dict) -> dict | None:
                 "zona": "Rodilla",
                 "criterio": "Torso demasiado vertical",
                 "lesiones": "Torso muy erguido traslada carga excesiva a la rodilla.",
-                "recomendacion": "Permití una ligera inclinación natural del torso "
+                "recomendacion": "Permite una ligera inclinación natural del torso "
                                  "llevando la cadera hacia atrás al bajar.",
             }
         return {
@@ -112,8 +112,8 @@ def _assess_criterion(c, features: dict) -> dict | None:
             "criterio": "Inclinación excesiva del torso",
             "lesiones": "Mayor carga compresiva y de cizalla en la columna lumbar: "
                         "riesgo de lumbalgia y lesión de disco.",
-            "recomendacion": "Mantené el pecho más alto y el core firme. Revisá que "
-                             "el peso no te lleve hacia adelante; reforzá la "
+            "recomendacion": "Mantén el pecho más alto y el core firme. Revisa que "
+                             "el peso no te lleve hacia adelante; refuerza la "
                              "musculatura del tronco.",
         }
 
@@ -123,8 +123,8 @@ def _assess_criterion(c, features: dict) -> dict | None:
             "criterio": "Rodilla se desplaza demasiado adelante",
             "lesiones": "Estrés en la articulación femoropatelar y el tendón "
                         "rotuliano: riesgo de tendinitis y dolor anterior de rodilla.",
-            "recomendacion": "Iniciá el movimiento llevando la cadera hacia atrás "
-                             "(bisagra) y repartí el peso en todo el pie, no en la "
+            "recomendacion": "Inicia el movimiento llevando la cadera hacia atrás "
+                             "(bisagra) y reparte el peso en todo el pie, no en la "
                              "punta.",
         }
 
@@ -134,7 +134,7 @@ def _assess_criterion(c, features: dict) -> dict | None:
             "criterio": "Asimetría entre piernas",
             "lesiones": "Descompensación que sobrecarga el lado dominante: riesgo "
                         "de lesión por carga desigual en rodilla o cadera.",
-            "recomendacion": "Revisá fuerza y movilidad del lado más débil. Sumá "
+            "recomendacion": "Revisa fuerza y movilidad del lado más débil. Suma "
                              "trabajo unilateral (p. ej. sentadilla búlgara) para "
                              "equilibrar.",
         }
@@ -145,8 +145,9 @@ def _assess_criterion(c, features: dict) -> dict | None:
             "criterio": "Rango de movimiento incompleto o inestable",
             "lesiones": "Recorrido parcial y posibles compensaciones: menor "
                         "efectividad y control del movimiento bajo carga.",
-            "recomendacion": "Trabajá el rango completo de forma lenta y controlada. "
-                             "Reforzá el core y la estabilidad antes de subir carga.",
+            "recomendacion": "Trabaja el rango completo de forma lenta y "
+                             "controlada. Refuerza el core y la estabilidad "
+                             "antes de subir carga.",
         }
 
     return None
