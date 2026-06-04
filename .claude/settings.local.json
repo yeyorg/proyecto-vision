@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(pip install ultralytics)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\julia\\\\OneDrive\\\\Documents\\\\ESPECIALIZACIÓN IA\\\\Vision_Computacional\\\\proyecto-vision\" -Recurse -Force)",
+      "Bash(Select-Object FullName, PSIsContainer)",
+      "Bash(Format-Table -AutoSize)",
+      "PowerShell($kaggleDir = \"$env:USERPROFILE\\\\.kaggle\"; if \\(!\\(Test-Path $kaggleDir\\)\\) { New-Item -ItemType Directory -Path $kaggleDir }; Set-Content -Path \"$kaggleDir\\\\kaggle.json\" -Value '{\"username\":\"julianacampuzano\",\"key\":\"KGAT_1b37adc4536cca1b8271ad27ce528bb0\"}' -Encoding utf8; Write-Output \"kaggle.json creado\")",
+      "PowerShell(kaggle datasets list --mine 2>&1)",
+      "PowerShell(head -20)",
+      "PowerShell(python -m kaggle datasets list --mine 2>&1)",
+      "PowerShell(C:\\\\Users\\\\julia\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python311\\\\Scripts\\\\kaggle.exe datasets list --mine 2>&1)"
+    ]
+  }
+}
