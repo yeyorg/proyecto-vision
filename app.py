@@ -143,7 +143,7 @@ def analyze_video_tracks(
         if not tracks:
             return {
                 "error": "No se detectaron sentadillas evaluables en el video. "
-                         "Asegurate de que la persona se vea de perfil y completa.",
+                         "Asegúrate de que la persona se vea de perfil y completa.",
                 "annotated_bytes": annotated_bytes,
                 "tracks": [],
             }
@@ -210,7 +210,7 @@ def main():
 
     # ── Sin video ─────────────────────────────────────────────────────────
     if video_bytes is None:
-        st.info("👈 Subí un video MP4 desde la barra lateral para analizar tu sentadilla.")
+        st.info("👈 Sube un video MP4 desde la barra lateral para analizar tu sentadilla.")
 
         st.markdown("### ¿Cómo funciona?")
         col1, col2, col3 = st.columns(3)
@@ -232,7 +232,7 @@ def main():
 
         st.markdown("---")
         st.markdown(
-            "**💡 Tip:** Grabate de perfil haciendo 3-5 sentadillas para mejor análisis."
+            "**💡 Tip:** Grábate de perfil haciendo 3-5 sentadillas para mejor análisis."
         )
         return
 
@@ -267,7 +267,7 @@ def main():
     # ── Selector de persona ───────────────────────────────────────────────
     st.subheader("🧍 Personas detectadas")
     st.caption(
-        "Se detecto mas de una persona. Elegi a quien queres analizar — "
+        "Se detecto mas de una persona. Elige a quien quieres analizar — "
         "el numero coincide con la etiqueta sobre cada persona en el video."
         if len(tracks) > 1 else
         "Se analizo la persona detectada en el video."
@@ -284,7 +284,7 @@ def main():
     if len(tracks) > 1:
         options = [t["track_id"] for t in tracks]
         selected_id = st.radio(
-            "¿Que persona queres evaluar?",
+            "¿Que persona quieres evaluar?",
             options,
             format_func=lambda tid: f"Persona {tid}",
             horizontal=True,
